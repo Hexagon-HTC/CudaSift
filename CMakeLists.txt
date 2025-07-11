@@ -1,34 +1,23 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.22)
 
-project(cudaSift)
+project(cudaSift LANGUAGES CXX CUDA)
 set(cudaSift_VERSION_MAJOR 2)
 set(cudaSift_VERSION_MINOR 0)
 set(cudaSift_VERSION_PATCH 0)
 
-set(CPACK_PACKAGE_VERSION_MAJOR "${cudaSift_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${cudaSift_VERSION_MINOR}")
-set(CPACK_PACKAGE_VERSION_PATCH "${cudaSift_VERSION_PATCH}")
-set(CPACK_GENERATOR "ZIP")
-include(CPack)
-
 find_package(OpenCV REQUIRED)
-find_package(CUDA)
-if (NOT CUDA_FOUND)
-  message(STATUS "CUDA not found. Project will not be built.")
-endif(NOT CUDA_FOUND)
+find_package(CUDA )
+
+set(CMAKE_CUDA_ARCHITECTURES "60;70;75;80;86")
 
 if (WIN32)
   set(EXTRA_CXX_FLAGS "/DVERBOSE /D_CRT_SECURE_NO_WARNINGS ")
-  list(APPEND CUDA_NVCC_FLAGS "-arch=sm_35;--compiler-options;-O2;-DVERBOSE") 
-endif()
-if (UNIX)
-  if (APPLE)
-    set(EXTRA_CXX_FLAGS "-DVERBOSE -msse2")
-    list(APPEND CUDA_NVCC_FLAGS "-arch=sm_35;--compiler-options;-O2;-DVERBOSE") 
-  else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -msse2 ")
-    list(APPEND CUDA_NVCC_FLAGS "-lineinfo;-ccbin;/usr/bin/gcc-6;--compiler-options;-O2;-D_FORCE_INLINES;-DVERBOSE_NOT") 
-  endif()
+elseif(UNIX)
+    if(APPLE)
+        set(EXTRA_CXX_FLAGS "-DVERBOSE -msse2")
+    else()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -msse2")
+    endif()
 endif()
 
 set(cuda_sources
@@ -42,37 +31,68 @@ set(cuda_sources
   cudautils.h
 )  
 
-set(sources
+set(cpp_sources
   geomFuncs.cpp  
-  mainSift.cpp  
 )
 
-include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR} 
+# Create the library
+add_library(cudaSift STATIC ${cuda_sources} ${cpp_sources})
+
+# Set library properties
+set_target_properties(cudaSift PROPERTIES
+    CUDA_SEPARABLE_COMPILATION ON
+    COMPILE_FLAGS "${EXTRA_CXX_FLAGS}"
+    POSITION_INDEPENDENT_CODE ON
 )
 
-#SET(CUDA_SEPARABLE_COMPILATION ON)
-
-cuda_add_executable(cudasift ${cuda_sources} ${sources} OPTIONS -arch=sm_35)
-
-#cuda_add_executable(l2net l2netD.cu OPTIONS -arch=sm_35)
-
-set_target_properties(cudasift PROPERTIES
-  COMPILE_FLAGS "${EXTRA_CXX_FLAGS}"			   
+# Include directories
+target_include_directories(cudaSift PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(cudasift ${CUDA_cudadevrt_LIBRARY} ${OpenCV_LIBS})
-#  /usr/local/cuda/lib64/libcudadevrt.a ${OpenCV_LIBS} 
-#)
- 
-install(FILES 
-  ${cuda_sources} 
-  ${sources}
-  cudaSiftD.cu
-  CMakeLists.txt
-  Copyright.txt
-  DESTINATION .
+# Link libraries
+target_link_libraries(cudaSift PUBLIC ${OpenCV_LIBS})
+target_link_libraries(cudaSift PRIVATE ${CUDA_LIBRARIES})
+
+# Installation
+install(TARGETS cudaSift
+    EXPORT cudaSiftTargets
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
 )
-install(FILES data/left.pgm data/righ.pgm
-  DESTINATION data
+
+install(FILES
+    cudaSift.h
+    cudaSiftH.h
+    cudaSiftD.h
+    cudaImage.h
+    cudautils.h
+    DESTINATION include
+)
+
+install(EXPORT cudaSiftTargets
+    FILE cudaSiftTargets.cmake
+    DESTINATION lib/cmake/cudaSift
+)
+
+# Create config files for find_package
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    cudaSiftConfigVersion.cmake
+    VERSION ${cudaSift_VERSION_MAJOR}.${cudaSift_VERSION_MINOR}.${cudaSift_VERSION_PATCH}
+    COMPATIBILITY SameMajorVersion
+)
+
+configure_package_config_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cudaSiftConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/cudaSiftConfig.cmake"
+    INSTALL_DESTINATION lib/cmake/cudaSift
+)
+
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/cudaSiftConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/cudaSiftConfigVersion.cmake"
+    DESTINATION lib/cmake/cudaSift
 )
