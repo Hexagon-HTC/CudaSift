@@ -6,7 +6,7 @@ set(cudaSift_VERSION_MINOR 0)
 set(cudaSift_VERSION_PATCH 0)
 
 find_package(OpenCV REQUIRED)
-find_package(CUDA )
+find_package(CUDA)
 
 set(CMAKE_CUDA_ARCHITECTURES "60;70;75;80;86")
 
@@ -52,7 +52,7 @@ target_include_directories(cudaSift PUBLIC
 )
 
 # Link libraries
-target_link_libraries(cudaSift PUBLIC ${OpenCV_LIBS})
+target_link_libraries(cudaSift PRIVATE ${OpenCV_LIBS})
 target_link_libraries(cudaSift PRIVATE ${CUDA_LIBRARIES})
 
 # Installation
