@@ -5,7 +5,7 @@ set(cudaSift_VERSION_MAJOR 2)
 set(cudaSift_VERSION_MINOR 0)
 set(cudaSift_VERSION_PATCH 0)
 
-find_package(OpenCV REQUIRED)
+find_package(OpenCV REQUIRED COMPONENTS opencv_core opencv_imgproc opencv_highgui)
 INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
 MESSAGE("OPENCVINCDIR=${OpenCV_INCLUDE_DIRS}")
 
@@ -56,7 +56,7 @@ target_include_directories(cudaSift PUBLIC
 )
 
 # Link libraries
-target_link_libraries(cudaSift PRIVATE ${OpenCV_LIBS})
+target_link_libraries(cudaSift PRIVATE opencv_core opencv_imgproc opencv_highgui)
 target_link_libraries(cudaSift PRIVATE ${CUDA_LIBRARIES})
 
 # Installation
