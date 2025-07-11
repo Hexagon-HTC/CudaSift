@@ -76,23 +76,3 @@ install(EXPORT cudaSiftTargets
     FILE cudaSiftTargets.cmake
     DESTINATION lib/cmake/cudaSift
 )
-
-# Create config files for find_package
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-    cudaSiftConfigVersion.cmake
-    VERSION ${cudaSift_VERSION_MAJOR}.${cudaSift_VERSION_MINOR}.${cudaSift_VERSION_PATCH}
-    COMPATIBILITY SameMajorVersion
-)
-
-configure_package_config_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cudaSiftConfig.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cudaSiftConfig.cmake"
-    INSTALL_DESTINATION lib/cmake/cudaSift
-)
-
-install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/cudaSiftConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/cudaSiftConfigVersion.cmake"
-    DESTINATION lib/cmake/cudaSift
-)
