@@ -7,6 +7,9 @@ set(cudaSift_VERSION_PATCH 0)
 
 set(CMAKE_CUDA_ARCHITECTURES "60;70;75;80;86")
 
+# Find OpenCV
+find_package(OpenCV REQUIRED)
+
 if (WIN32)
   set(EXTRA_CXX_FLAGS "/DVERBOSE /D_CRT_SECURE_NO_WARNINGS ")
 elseif(UNIX)
@@ -49,6 +52,10 @@ target_include_directories(cudaSift PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:include>
 )
+
+# Link OpenCV
+target_link_libraries(cudaSift PUBLIC ${OpenCV_LIBS})
+target_include_directories(cudaSift PRIVATE ${OpenCV_INCLUDE_DIRS})
 
 # Installation
 install(TARGETS cudaSift
