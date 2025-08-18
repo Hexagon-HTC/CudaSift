@@ -5,14 +5,7 @@ set(cudaSift_VERSION_MAJOR 2)
 set(cudaSift_VERSION_MINOR 0)
 set(cudaSift_VERSION_PATCH 0)
 
-find_package(OpenCV REQUIRED COMPONENTS opencv_core opencv_imgproc opencv_highgui)
-INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
-MESSAGE("OPENCVINCDIR=${OpenCV_INCLUDE_DIRS}")
-
-find_package(CUDA)
-
 set(CMAKE_CUDA_ARCHITECTURES "60;70;75;80;86")
-SET(REQUIRED_LIBRARIES ${REQUIRED_LIBRARIES} ${OpenCV_LIBS})
 
 if (WIN32)
   set(EXTRA_CXX_FLAGS "/DVERBOSE /D_CRT_SECURE_NO_WARNINGS ")
@@ -28,12 +21,13 @@ set(cuda_sources
   cudaImage.cu  
   cudaImage.h  
   cudaSiftH.cu 
-  cudaSiftH.h  
-  matching.cu  
+  cudaSiftH.h
+  cudaSiftD.cu  # Add missing source file
   cudaSiftD.h  
+  matching.cu  
   cudaSift.h  
   cudautils.h
-)  
+) 
 
 set(cpp_sources
   geomFuncs.cpp  
@@ -50,15 +44,11 @@ set_target_properties(cudaSift PROPERTIES
     POSITION_INDEPENDENT_CODE ON
 )
 
-# Include directories
+# Include directories - use target-specific instead of global
 target_include_directories(cudaSift PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:include>
 )
-
-# Link libraries
-target_link_libraries(cudaSift PRIVATE opencv_core opencv_imgproc opencv_highgui)
-target_link_libraries(cudaSift PRIVATE ${CUDA_LIBRARIES})
 
 # Installation
 install(TARGETS cudaSift
