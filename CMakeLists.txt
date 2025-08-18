@@ -1,18 +1,17 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(cudaSift LANGUAGES C CXX CUDA)
-
+project(cudaSift LANGUAGES CXX CUDA)
 set(cudaSift_VERSION_MAJOR 2)
 set(cudaSift_VERSION_MINOR 0)
 set(cudaSift_VERSION_PATCH 0)
 
-find_package(OpenCV REQUIRED COMPONENTS opencv_core opencv_imgproc opencv_highgui CONFIG)
+find_package(OpenCV REQUIRED COMPONENTS opencv_core opencv_imgproc opencv_highgui)
 INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
 MESSAGE("OPENCVINCDIR=${OpenCV_INCLUDE_DIRS}")
 
 find_package(CUDA)
 
-set(CMAKE_CUDA_ARCHITECTURES "60;70;75;80;86;89")
+set(CMAKE_CUDA_ARCHITECTURES "60;70;75;80;86")
 SET(REQUIRED_LIBRARIES ${REQUIRED_LIBRARIES} ${OpenCV_LIBS})
 
 if (WIN32)
