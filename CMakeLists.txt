@@ -41,6 +41,7 @@ set(cpp_sources
 
 # Create the library
 add_library(cudaSift STATIC ${cuda_sources} ${cpp_sources})
+target_compile_definitions(cudaSift PRIVATE CUDASIFT_BUILD)
 
 # Set library properties
 set_target_properties(cudaSift PROPERTIES
