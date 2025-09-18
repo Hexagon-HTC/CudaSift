@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(cudaSift LANGUAGES CXX CUDA)
+project(cudasift LANGUAGES CXX CUDA)
 set(cudaSift_VERSION_MAJOR 2)
 set(cudaSift_VERSION_MINOR 0)
 set(cudaSift_VERSION_PATCH 0)
@@ -38,21 +38,21 @@ set(cpp_sources
 )
 
 # Create the library
-add_library(cudaSift STATIC ${cuda_sources} ${cpp_sources})
-target_compile_definitions(cudaSift PRIVATE CUDASIFT_BUILD)
+add_library(cudasift STATIC ${cuda_sources} ${cpp_sources})
+target_compile_definitions(cudasift PRIVATE CUDASIFT_BUILD)
 
 # Set library properties
-set_target_properties(cudaSift PROPERTIES
+set_target_properties(cudasift PROPERTIES
     CUDA_SEPARABLE_COMPILATION ON
     COMPILE_FLAGS "${EXTRA_CXX_FLAGS}"
     POSITION_INDEPENDENT_CODE ON
 )
 
 # Include directories - use target-specific instead of global
-target_include_directories(cudaSift PUBLIC
+target_include_directories(cudasift PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:include>
 )
 
 # Link OpenCV
-target_link_libraries(cudaSift PUBLIC opencv_core)
+target_link_libraries(cudasift PUBLIC opencv_core)
