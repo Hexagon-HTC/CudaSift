@@ -72,7 +72,5 @@ install(FILES
     cudaSiftD.h
     cudaSift.h
     cudautils.h
-    geomFuncs.cpp # (if you want to install this as a header, but usually .cpp is not installed)
-    # Add any other public headers here
     DESTINATION include
 )
