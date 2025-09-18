@@ -56,3 +56,23 @@ target_include_directories(cudasift PUBLIC
 
 # Link OpenCV
 target_link_libraries(cudasift PUBLIC opencv_core)
+
+# Install the library
+install(TARGETS cudaSift
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
+)
+
+# Install headers
+install(FILES
+    cudaImage.h
+    cudaSiftH.h
+    cudaSiftD.h
+    cudaSift.h
+    cudautils.h
+    geomFuncs.cpp # (if you want to install this as a header, but usually .cpp is not installed)
+    # Add any other public headers here
+    DESTINATION include
+)
