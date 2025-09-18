@@ -58,7 +58,7 @@ target_include_directories(cudasift PUBLIC
 target_link_libraries(cudasift PUBLIC opencv_core)
 
 # Install the library
-install(TARGETS cudaSift
+install(TARGETS cudasift
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin
