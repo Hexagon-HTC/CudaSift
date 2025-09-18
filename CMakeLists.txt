@@ -56,25 +56,3 @@ target_include_directories(cudaSift PUBLIC
 
 # Link OpenCV
 target_link_libraries(cudaSift PUBLIC opencv_core)
-
-# Installation
-install(TARGETS cudaSift
-    EXPORT cudaSiftTargets
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    RUNTIME DESTINATION bin
-)
-
-install(FILES
-    cudaSift.h
-    cudaSiftH.h
-    cudaSiftD.h
-    cudaImage.h
-    cudautils.h
-    DESTINATION include
-)
-
-install(EXPORT cudaSiftTargets
-    FILE cudaSiftTargets.cmake
-    DESTINATION lib/cmake/cudaSift
-)
