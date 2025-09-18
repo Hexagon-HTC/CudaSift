@@ -5,10 +5,11 @@ set(cudaSift_VERSION_MAJOR 2)
 set(cudaSift_VERSION_MINOR 0)
 set(cudaSift_VERSION_PATCH 0)
 
-set(CMAKE_CUDA_ARCHITECTURES "60;70;75;80;86")
+set(CMAKE_CUDA_ARCHITECTURES "60;61;70;75;80;86;89")
 
 # Find OpenCV
-find_package(OpenCV REQUIRED)
+find_package(OpenCV REQUIRED COMPONENTS opencv_core)
+
 
 if (WIN32)
   set(EXTRA_CXX_FLAGS "/DVERBOSE /D_CRT_SECURE_NO_WARNINGS ")
@@ -21,14 +22,14 @@ elseif(UNIX)
 endif()
 
 set(cuda_sources
-  cudaImage.cu  
-  cudaImage.h  
-  cudaSiftH.cu 
+  cudaImage.cu
+  cudaImage.h
+  cudaSiftH.cu
   cudaSiftH.h
-  cudaSiftD.cu  # Add missing source file
-  cudaSiftD.h  
-  matching.cu  
-  cudaSift.h  
+  cudaSiftD.cu
+  cudaSiftD.h
+  matching.cu
+  cudaSift.h
   cudautils.h
 ) 
 
@@ -54,8 +55,7 @@ target_include_directories(cudaSift PUBLIC
 )
 
 # Link OpenCV
-target_link_libraries(cudaSift PUBLIC ${OpenCV_LIBS})
-target_include_directories(cudaSift PRIVATE ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(cudaSift PUBLIC opencv_core)
 
 # Installation
 install(TARGETS cudaSift
