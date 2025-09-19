@@ -1,5 +1,6 @@
 #ifndef CUDASIFT_H
 #define CUDASIFT_H
+#pragma once
 
 #include "cudaImage.h"
 

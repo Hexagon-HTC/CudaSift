@@ -1,5 +1,6 @@
 #ifndef CUDAUTILS_H
 #define CUDAUTILS_H
+#pragma once
 
 #include <cstdio>
 #include <iostream>
