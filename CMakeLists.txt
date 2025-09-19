@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 
+set(WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
 project(cudasift LANGUAGES CXX CUDA)
 set(cudaSift_VERSION_MAJOR 2)
 set(cudaSift_VERSION_MINOR 0)
