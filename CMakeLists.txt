@@ -45,7 +45,7 @@ add_library(cudasift ${cuda_sources} ${cpp_sources})
 
 # Set library properties
 set_target_properties(cudasift PROPERTIES
-    CUDA_SEPARABLE_COMPILATION ON
+    CUDA_SEPARABLE_COMPILATION OFF
     CUDA_RESOLVE_DEVICE_SYMBOLS ON
     COMPILE_FLAGS "${EXTRA_CXX_FLAGS}"
     POSITION_INDEPENDENT_CODE ON
