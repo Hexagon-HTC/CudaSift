@@ -6,6 +6,8 @@
 #ifndef CUDASIFTD_H
 #define CUDASIFTD_H
 
+#include "cudaSift.h"
+
 #define NUM_SCALES      5
 
 // Scale down thread block width
