@@ -40,7 +40,7 @@ set(cpp_sources
 )
 
 # Create the library
-add_library(cudasift STATIC ${cuda_sources} ${cpp_sources})
+add_library(cudasift SHARED ${cuda_sources} ${cpp_sources})
 target_compile_definitions(cudasift PRIVATE CUDASIFT_BUILD)
 
 # Set library properties
@@ -74,8 +74,5 @@ install(FILES
     cudaSiftD.h
     cudaSift.h
     cudautils.h
-    cudaSiftH.cu
-    matching.cu
-    cudaImage.cu
     DESTINATION include
 )
