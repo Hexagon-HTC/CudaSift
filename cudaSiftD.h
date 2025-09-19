@@ -56,4 +56,45 @@
 // ComputeOrientations:     numpts
 // ExtractSiftDescriptors:  numpts
 
+//====================== Extern device symbols ====================//
+// These are defined in cudaSiftD.cu
+extern __constant__ int d_MaxNumPoints;
+extern __device__ unsigned int d_PointCounter[8*2+1];
+extern __constant__ float d_ScaleDownKernel[5];
+extern __constant__ float d_LowPassKernel[2*LOWPASS_R+1];
+extern __constant__ float d_LaplaceKernel[8*12*16];
+
+//====================== Kernel forward declarations =============//
+// Only kernels launched from other translation units need forward decls.
+// (CUDA separate compilation would allow implicit declarations, but explicit
+// ones give better compile-time checking.)
+// Scale / low-pass
+__global__ void ScaleDownDenseShift(float *d_Result, float *d_Data, int width, int pitch, int height, int newpitch);
+__global__ void ScaleDownDense(float *d_Result, float *d_Data, int width, int pitch, int height, int newpitch);
+__global__ void ScaleDown(float *d_Result, float *d_Data, int width, int pitch, int height, int newpitch);
+__global__ void ScaleUp(float *d_Result, float *d_Data, int width, int pitch, int height, int newpitch);
+__global__ void LowPass(float *d_Image, float *d_Result, int width, int pitch, int height);
+__global__ void LowPassBlock(float *d_Image, float *d_Result, int width, int pitch, int height);
+__global__ void LowPassBlockOld(float *d_Image, float *d_Result, int width, int pitch, int height);
+
+// Laplace / extrema detection
+__global__ void LaplaceMultiMem(float *baseImage, float *results, int width, int pitch, int height, int octave);
+__global__ void LaplaceMultiMemTest(float *baseImage, float *results, int width, int pitch, int height, int octave);
+__global__ void LaplaceMultiMemOld(float *baseImage, float *results, int width, int pitch, int height, int octave);
+__global__ void LaplaceMultiTex(cudaTextureObject_t texObj, float *results, int width, int pitch, int height, int octave);
+
+// Orientation and descriptor
+struct SiftPoint; // forward (defined in cudaSift.h)
+__global__ void ComputeOrientationsCONST(cudaTextureObject_t texObj, SiftPoint *d_Sift, int octave);
+__global__ void ComputeOrientationsCONSTNew(float *d_Data, int width, int pitch, int height, SiftPoint *d_Sift, int octave);
+__global__ void ExtractSiftDescriptorsCONST(cudaTextureObject_t texObj, SiftPoint *d_Sift, float subsampling, int octave);
+__global__ void ExtractSiftDescriptorsCONSTNew(cudaTextureObject_t texObj, SiftPoint *d_Sift, float subsampling, int octave);
+__global__ void OrientAndExtractCONST(cudaTextureObject_t texObj, SiftPoint *d_Sift, float subsampling, int octave);
+__global__ void RescalePositions(SiftPoint *d_Sift, int numPts, float scale);
+
+// Keypoint detection variants
+__global__ void FindPointsMulti(float *sources, SiftPoint *d_Sift, int width, int pitch, int height, float subsampling, float lowestScale, float thresh, float factor, float edgeLimit, int octave);
+__global__ void FindPointsMultiNew(float *sources, SiftPoint *d_Sift, int width, int pitch, int height, float subsampling, float lowestScale, float thresh, float factor, float edgeLimit, int octave);
+__global__ void FindPointsMultiTest(float *sources, SiftPoint *d_Sift, int width, int pitch, int height, float subsampling, float lowestScale, float thresh, float factor, float edgeLimit, int octave);
+
 #endif

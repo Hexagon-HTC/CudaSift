@@ -13,8 +13,9 @@
 #include "cudaSift.h"
 #include "cudaSiftD.h"
 #include "cudaSiftH.h"
-
-#include "cudaSiftD.cu"
+// Removed inclusion of implementation file cudaSiftD.cu to avoid
+// multiple definition of kernels when both translation units are compiled.
+// Kernels and device symbols are now forward-declared in cudaSiftD.h.
 
 void InitCuda(int devNum)
 {
