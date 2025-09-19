@@ -2,12 +2,13 @@ cmake_minimum_required(VERSION 3.22)
 
 set(WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
+set(CMAKE_CUDA_ARCHITECTURES "60;61;70;75;80;86;89")
+
 project(cudasift LANGUAGES CXX CUDA)
 set(cudaSift_VERSION_MAJOR 2)
 set(cudaSift_VERSION_MINOR 0)
 set(cudaSift_VERSION_PATCH 0)
 
-set(CMAKE_CUDA_ARCHITECTURES "60;61;70;75;80;86;89")
 
 # Find OpenCV
 find_package(OpenCV REQUIRED COMPONENTS opencv_core)
