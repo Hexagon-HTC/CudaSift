@@ -1,5 +1,6 @@
 #ifndef CUDASIFTH_H
 #define CUDASIFTH_H
+#pragma once
 
 #include "cudautils.h"
 #include "cudaImage.h"
