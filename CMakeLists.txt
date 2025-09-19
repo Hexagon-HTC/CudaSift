@@ -10,7 +10,7 @@ if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
 endif()
 
 # Define the library
-add_library(cudasift SHARED
+add_library(cudasift
     cudaSiftH.cu
     matching.cu
 )
