@@ -5,6 +5,9 @@
 #ifndef CUDASIFTD_H
 #define CUDASIFTD_H
 
+#include <cuda_runtime.h>
+#include "cudaSift.h"
+
 #define NUM_SCALES      5
 
 // Scale down thread block width
@@ -54,5 +57,34 @@
 // FindPointsMulti:         (width/MINMAX_W)*NUM_SCALES * (height/MINMAX_H)
 // ComputeOrientations:     numpts
 // ExtractSiftDescriptors:  numpts
+
+//====================== Function declarations =================//
+
+// Constant memory symbols
+extern __constant__ int d_MaxNumPoints;
+extern __device__ unsigned int d_PointCounter[8*2+1];
+extern __constant__ float d_ScaleDownKernel[5];
+extern __constant__ float d_LowPassKernel[2*LOWPASS_R+1];
+extern __constant__ float d_LaplaceKernel[8*12*16];
+
+// Kernel function declarations
+__global__ void ScaleDownDenseShift(float *d_Result, float *d_Data, int width, int pitch, int height, int newpitch);
+__global__ void ScaleDown(float *d_Result, float *d_Data, int width, int pitch, int height, int newpitch);
+__global__ void ScaleUp(float *d_Result, float *d_Data, int width, int pitch, int height, int newpitch);
+__global__ void ComputeOrientationsCONST(cudaTextureObject_t texObj, SiftPoint *d_Sift, int octave);
+__global__ void ComputeOrientationsCONSTNew(float *image, int w, int p, int h, SiftPoint *d_Sift, int octave);
+__global__ void ExtractSiftDescriptorsCONST(cudaTextureObject_t texObj, SiftPoint *d_sift, float subsampling, int octave);
+__global__ void ExtractSiftDescriptorsCONSTNew(cudaTextureObject_t texObj, SiftPoint *d_sift, float subsampling, int octave);
+__global__ void OrientAndExtractCONST(cudaTextureObject_t texObj, SiftPoint *d_Sift, float subsampling, int octave);
+__global__ void RescalePositions(SiftPoint *d_sift, int numPts, float scale);
+__global__ void LowPassBlock(float *d_Image, float *d_Result, int width, int pitch, int height);
+__global__ void LowPass(float *d_Image, float *d_Result, int width, int pitch, int height);
+__global__ void LaplaceMultiMem(float *d_Image, float *d_Result, int width, int pitch, int height, int octave);
+__global__ void LaplaceMultiMemTest(float *d_Image, float *d_Result, int width, int pitch, int height, int octave);
+__global__ void LaplaceMultiMemOld(float *d_Image, float *d_Result, int width, int pitch, int height, int octave);
+__global__ void LaplaceMultiTex(cudaTextureObject_t texObj, float *d_Result, int width, int pitch, int height, int octave);
+__global__ void FindPointsMultiTest(float *d_Data0, SiftPoint *d_Sift, int width, int pitch, int height, float subsampling, float lowestScale, float thresh, float factor, float edgeLimit, int octave);
+__global__ void FindPointsMulti(float *d_Data0, SiftPoint *d_Sift, int width, int pitch, int height, float subsampling, float lowestScale, float thresh, float factor, float edgeLimit, int octave);
+__global__ void FindPointsMultiNew(float *d_Data0, SiftPoint *d_Sift, int width, int pitch, int height, float subsampling, float lowestScale, float thresh, float factor, float edgeLimit, int octave);
 
 #endif
