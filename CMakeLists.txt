@@ -12,7 +12,6 @@ set(CMAKE_CUDA_ARCHITECTURES "60;61;70;75;80;86;89")
 # Find OpenCV
 find_package(OpenCV REQUIRED COMPONENTS opencv_core)
 
-
 if (WIN32)
   set(EXTRA_CXX_FLAGS "/DVERBOSE /D_CRT_SECURE_NO_WARNINGS ")
 elseif(UNIX)
@@ -33,15 +32,15 @@ set(cuda_sources
   matching.cu
   cudaSift.h
   cudautils.h
-) 
+)
 
 set(cpp_sources
-  geomFuncs.cpp  
+  geomFuncs.cpp
 )
 
 # Create the library
-add_library(cudasift SHARED ${cuda_sources} ${cpp_sources})
-target_compile_definitions(cudasift PRIVATE CUDASIFT_BUILD)
+add_library(cudasift ${cuda_sources} ${cpp_sources})
+# target_compile_definitions(cudasift PRIVATE CUDASIFT_BUILD)
 
 # Set library properties
 set_target_properties(cudasift PROPERTIES
