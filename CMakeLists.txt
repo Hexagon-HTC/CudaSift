@@ -72,5 +72,8 @@ install(FILES
     cudaSiftD.h
     cudaSift.h
     cudautils.h
+    cudaSiftH.cu
+    matching.cu
+    cudaImage.cu
     DESTINATION include
 )
