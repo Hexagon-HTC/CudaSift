@@ -84,7 +84,6 @@ __global__ void LaplaceMultiMemOld(float *baseImage, float *results, int width, 
 __global__ void LaplaceMultiTex(cudaTextureObject_t texObj, float *results, int width, int pitch, int height, int octave);
 
 // Orientation and descriptor
-struct SiftPoint; // forward (defined in cudaSift.h)
 __global__ void ComputeOrientationsCONST(cudaTextureObject_t texObj, SiftPoint *d_Sift, int octave);
 __global__ void ComputeOrientationsCONSTNew(float *d_Data, int width, int pitch, int height, SiftPoint *d_Sift, int octave);
 __global__ void ExtractSiftDescriptorsCONST(cudaTextureObject_t texObj, SiftPoint *d_Sift, float subsampling, int octave);
