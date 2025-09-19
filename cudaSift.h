@@ -2,15 +2,23 @@
 #define CUDASIFT_H
 #pragma once
 
-// Windows DLL export/import macros
-#ifdef _WIN32
-  #ifdef CUDASIFT_EXPORTS
-    #define CUDASIFT_API __declspec(dllexport)
+#if defined(_WIN32)
+  #if defined(CUDASIFT_SHARED)
+    #if defined(CUDASIFT_EXPORTS)
+      #define CUDASIFT_API __declspec(dllexport)
+    #else
+      #define CUDASIFT_API __declspec(dllimport)
+    #endif
   #else
-    #define CUDASIFT_API __declspec(dllimport)
+    // Static build or no explicit sharing; no decoration needed
+    #define CUDASIFT_API
   #endif
 #else
-  #define CUDASIFT_API
+  #if defined(CUDASIFT_SHARED) && defined(__GNUC__)
+    #define CUDASIFT_API __attribute__((visibility("default")))
+  #else
+    #define CUDASIFT_API
+  #endif
 #endif
 
 typedef struct {
