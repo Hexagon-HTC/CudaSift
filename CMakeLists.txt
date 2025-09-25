@@ -1,78 +1,76 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.22)
 
-project(cudaSift)
-set(cudaSift_VERSION_MAJOR 2)
-set(cudaSift_VERSION_MINOR 0)
-set(cudaSift_VERSION_PATCH 0)
+project(cudasift LANGUAGES CXX CUDA)
 
-set(CPACK_PACKAGE_VERSION_MAJOR "${cudaSift_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${cudaSift_VERSION_MINOR}")
-set(CPACK_PACKAGE_VERSION_PATCH "${cudaSift_VERSION_PATCH}")
-set(CPACK_GENERATOR "ZIP")
-include(CPack)
+# -------------------------------------------------------------
+# Options
+# -------------------------------------------------------------
+option(BUILD_SHARED_LIBS "Build CudaSift as a shared library" ON)
+set(CUDASIFT_CUDA_RUNTIME "Shared" CACHE STRING "Select CUDA runtime linkage (Shared|Static)")
+set_property(CACHE CUDASIFT_CUDA_RUNTIME PROPERTY STRINGS Shared Static)
 
-find_package(OpenCV REQUIRED)
-find_package(CUDA)
-if (NOT CUDA_FOUND)
-  message(STATUS "CUDA not found. Project will not be built.")
-endif(NOT CUDA_FOUND)
-
-if (WIN32)
-  set(EXTRA_CXX_FLAGS "/DVERBOSE /D_CRT_SECURE_NO_WARNINGS ")
-  list(APPEND CUDA_NVCC_FLAGS "-arch=sm_35;--compiler-options;-O2;-DVERBOSE") 
-endif()
-if (UNIX)
-  if (APPLE)
-    set(EXTRA_CXX_FLAGS "-DVERBOSE -msse2")
-    list(APPEND CUDA_NVCC_FLAGS "-arch=sm_35;--compiler-options;-O2;-DVERBOSE") 
-  else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -msse2 ")
-    list(APPEND CUDA_NVCC_FLAGS "-lineinfo;-ccbin;/usr/bin/gcc-6;--compiler-options;-O2;-D_FORCE_INLINES;-DVERBOSE_NOT") 
-  endif()
+# Allow user override of architectures; provide a modern default set if unset
+if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+    set(CMAKE_CUDA_ARCHITECTURES 75 86 89 CACHE STRING "CUDA arch list" FORCE)
 endif()
 
-set(cuda_sources
-  cudaImage.cu  
-  cudaImage.h  
-  cudaSiftH.cu 
-  cudaSiftH.h  
-  matching.cu  
-  cudaSiftD.h  
-  cudaSift.h  
-  cudautils.h
-)  
+# Find CUDA toolkit (modern CUDAToolkit package)
+find_package(CUDAToolkit REQUIRED)
 
-set(sources
-  geomFuncs.cpp  
-  mainSift.cpp  
+# -------------------------------------------------------------
+# Library target
+# -------------------------------------------------------------
+add_library(cudasift
+    cudaSiftH.cu
+    matching.cu
 )
-
-include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR} 
-)
-
-#SET(CUDA_SEPARABLE_COMPILATION ON)
-
-cuda_add_executable(cudasift ${cuda_sources} ${sources} OPTIONS -arch=sm_35)
-
-#cuda_add_executable(l2net l2netD.cu OPTIONS -arch=sm_35)
 
 set_target_properties(cudasift PROPERTIES
-  COMPILE_FLAGS "${EXTRA_CXX_FLAGS}"			   
+    POSITION_INDEPENDENT_CODE ON
+    CUDA_RUNTIME_LIBRARY ${CUDASIFT_CUDA_RUNTIME}
 )
 
-target_link_libraries(cudasift ${CUDA_cudadevrt_LIBRARY} ${OpenCV_LIBS})
-#  /usr/local/cuda/lib64/libcudadevrt.a ${OpenCV_LIBS} 
-#)
- 
-install(FILES 
-  ${cuda_sources} 
-  ${sources}
-  cudaSiftD.cu
-  CMakeLists.txt
-  Copyright.txt
-  DESTINATION .
+# Public interface include dirs
+target_include_directories(cudasift
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:include>
 )
-install(FILES data/left.pgm data/righ.pgm
-  DESTINATION data
+
+# Link CUDA runtime (cudart) explicitly
+target_link_libraries(cudasift PUBLIC CUDA::cudart)
+
+# Export macro logic: only export/import when building shared
+if(BUILD_SHARED_LIBS)
+    target_compile_definitions(cudasift
+        PUBLIC CUDASIFT_SHARED
+        PRIVATE CUDASIFT_EXPORTS
+    )
+else()
+    target_compile_definitions(cudasift PUBLIC CUDASIFT_STATIC)
+endif()
+
+# -------------------------------------------------------------
+# Installation
+# -------------------------------------------------------------
+install(TARGETS cudasift
+    EXPORT CudaSiftTargets
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
 )
+
+install(FILES
+    cudaSift.h
+    cudaUtils.h
+    DESTINATION include
+)
+
+# Print configuration summary
+message(STATUS "CudaSift Configuration Summary:")
+message(STATUS "  Build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "  Library type: ${BUILD_SHARED_LIBS}")
+message(STATUS "  CUDA runtime linkage: ${CUDASIFT_CUDA_RUNTIME}")
+message(STATUS "  CUDA architectures: ${CMAKE_CUDA_ARCHITECTURES}")
+message(STATUS "  Install prefix: ${CMAKE_INSTALL_PREFIX}")
