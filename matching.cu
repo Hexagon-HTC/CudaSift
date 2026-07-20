@@ -1,5 +1,5 @@
 #include "cudaSift.h"
-#include "cudautils.h"
+#include "cudaUtils.h"
 
 #include <cuda_runtime.h>
 
